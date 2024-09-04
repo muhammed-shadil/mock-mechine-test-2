@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "663004418507",
+    "project_id": "money-exchange-792a1",
+    "storage_bucket": "money-exchange-792a1.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:663004418507:android:e4cb3ddaa449f2238e264e",
+        "android_client_info": {
+          "package_name": "com.example.mock_mechine_test"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBBLuA2046z_SeXCs36ojA0iglHSy6bcZ0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:663004418507:android:2c4ba16ba728d4898e264e",
+        "android_client_info": {
+          "package_name": "com.example.mock_mechine_test2"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBBLuA2046z_SeXCs36ojA0iglHSy6bcZ0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

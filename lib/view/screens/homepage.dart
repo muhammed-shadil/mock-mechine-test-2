@@ -4,7 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
+import 'package:mock_mechine_test2/controller/authentication/bloc/auth_bloc.dart';
 import 'package:mock_mechine_test2/controller/bloc/exchange_bloc.dart';
+import 'package:mock_mechine_test2/view/screens/autherntication/signin_screen.dart';
 import 'package:mock_mechine_test2/view/widgets/custom_appbar.dart';
 import 'package:mock_mechine_test2/view/widgets/main_list_tile.dart';
 
@@ -13,8 +15,15 @@ class InteractivePieChartWrapper extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => ExchangeBloc(),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(
+          create: (context) => ExchangeBloc(),
+        ),
+        BlocProvider(
+          create: (context) => AuthBloc(),
+        ),
+      ],
       child: const InteractivePieChart(),
     );
   }
@@ -124,101 +133,121 @@ class _InteractivePieChartState extends State<InteractivePieChart>
   @override
   Widget build(BuildContext context) {
     return SafeArea(
-      child: Scaffold(
-        backgroundColor: Color(0xFF1B1B2F),
-        appBar: const CustomAppBar(),
-        body: Column(
-          children: [
-            Expanded(
-              flex: 2,
-              child: GestureDetector(
-                onTap: _startLoadingAnimation,
-                child: Stack(
-                  alignment: Alignment.center,
-                  children: <Widget>[
-                    PieChart(
-                      PieChartData(
-                        centerSpaceColor: Colors.white,
-                        startDegreeOffset: 270,
-                        sectionsSpace: 0,
-                        centerSpaceRadius: 60,
-                        sections: showingSections(),
-                        pieTouchData: PieTouchData(
-                          touchCallback:
-                              (FlTouchEvent event, pieTouchResponse) {
-                            if (event is FlTapUpEvent) {
-                              _startLoadingAnimation();
-                            }
-                          },
+      child: BlocListener<AuthBloc, AuthState>(
+        listener: (context, state) {
+          if (state is AuthLoading) {
+            const Center(
+                child: CircularProgressIndicator(
+              color: Colors.white,
+            ));
+          } else if (state is AuthenticatedError) {
+            ScaffoldMessenger.of(context)
+                .showSnackBar(SnackBar(content: Text(state.message)));
+          } else if (state is UnAuthenticated) {
+            ScaffoldMessenger.of(context)
+                .showSnackBar(SnackBar(content: Text("logout")));
+
+            Navigator.push(context,
+                MaterialPageRoute(builder: (_) => const signinwrapper()));
+          }
+        },
+        child: Scaffold(
+          backgroundColor: const Color(0xFF1B1B2F),
+          appBar: const CustomAppBar(),
+          body: Column(
+            children: [
+              Expanded(
+                flex: 2,
+                child: GestureDetector(
+                  onTap: _startLoadingAnimation,
+                  child: Stack(
+                    alignment: Alignment.center,
+                    children: <Widget>[
+                      PieChart(
+                        PieChartData(
+                          centerSpaceColor: Colors.white,
+                          startDegreeOffset: 270,
+                          sectionsSpace: 0,
+                          centerSpaceRadius: 60,
+                          sections: showingSections(),
+                          pieTouchData: PieTouchData(
+                            touchCallback:
+                                (FlTouchEvent event, pieTouchResponse) {
+                              if (event is FlTapUpEvent) {
+                                _startLoadingAnimation();
+                              }
+                            },
+                          ),
                         ),
                       ),
-                    ),
-                    Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            '\$$_centerNumber', // Display the generated number
-                            style: const TextStyle(
-                              fontSize: 24,
-                              color: Colors.black,
-                              fontWeight: FontWeight.bold,
+                      Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              '\$$_centerNumber', // Display the generated number
+                              style: const TextStyle(
+                                fontSize: 24,
+                                color: Colors.black,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
-                          ),
-                          const Text(
-                            'Last \$234.67',
-                            style: TextStyle(
-                              fontSize: 16,
-                              color: Colors.black38,
+                            const Text(
+                              'Last \$234.67',
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: Colors.black38,
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
-            ),
-            Expanded(
-              flex: 3,
-              child: Center(
-                child: Container(
-                  decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(20),
-                      color: const Color.fromARGB(255, 37, 37, 61)),
-                  width: MediaQuery.of(context).size.width * 0.9,
-                  child: BlocBuilder<ExchangeBloc, ExchangeState>(
-                      builder: (context, state) {
-                    if (state is Loadingstate) {
-                      return const Center(child: CircularProgressIndicator());
-                    } else if (state is Successfetching) {
-                      return ListView.builder(
-                        itemCount: state.conversionRatesData.length,
-                        itemBuilder: (BuildContext context, int index) {
-                          final String country =
-                              state.conversionRatesData.keys.elementAt(index);
-                          final dynamic currency =
-                              state.conversionRatesData[country];
-                          final String lastupdate = state.lastupdate;
+              Expanded(
+                flex: 3,
+                child: Center(
+                  child: Container(
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(20),
+                        color: const Color.fromARGB(255, 37, 37, 61)),
+                    width: MediaQuery.of(context).size.width * 0.9,
+                    child: BlocBuilder<ExchangeBloc, ExchangeState>(
+                        builder: (context, state) {
+                      if (state is Loadingstate) {
+                        return const Center(child: CircularProgressIndicator());
+                      } else if (state is Successfetching) {
+                        return ListView.builder(
+                          itemCount: state.conversionRatesData.length,
+                          itemBuilder: (BuildContext context, int index) {
+                            final String country =
+                                state.conversionRatesData.keys.elementAt(index);
+                            final dynamic currency =
+                                state.conversionRatesData[country];
+                            final String lastupdate = state.lastupdate;
 
-                          return MainListTile(
-                            centerNumber: _centerNumber,
-                            countries: country,
-                            exchangerate:
-                                currency.runtimeType == double ? currency : 0.0,
-                            lastupdate:
-                                DateFormat("EEE, dd MMM yyyy HH:mm:ss Z")
-                                    .parse(lastupdate),
-                          );
-                        },
-                      );
-                    }
-                    return Container();
-                  }),
+                            return MainListTile(
+                              centerNumber: _centerNumber,
+                              countries: country,
+                              exchangerate: currency.runtimeType == double
+                                  ? currency
+                                  : 1.0,
+                              lastupdate:
+                                  DateFormat("EEE, dd MMM yyyy HH:mm:ss Z")
+                                      .parse(lastupdate),
+                            );
+                          },
+                        );
+                      }
+                      return Container();
+                    }),
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -255,27 +284,3 @@ class _InteractivePieChartState extends State<InteractivePieChart>
     ];
   }
 }
-
-List<String> countries = [
-  "aed",
-  "afn",
-  "all",
-  "amd",
-  "ang",
-  "aoa",
-  "ars",
-  "aud",
-  "awg",
-  "azn",
-  "bam",
-  "bbd",
-  "bdt",
-  "bgn",
-  "bhd",
-  "bif",
-  "bmd",
-  "bnd",
-  "bob",
-  "brl",
-  "bsd"
-];

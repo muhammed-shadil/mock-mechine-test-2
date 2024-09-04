@@ -58,7 +58,8 @@ class MainListTile extends StatelessWidget {
                   ),
                   Text(
                     formattedDate,
-                    style: TextStyle(color: Color.fromARGB(255, 184, 183, 183)),
+                    style: const TextStyle(
+                        color: Color.fromARGB(255, 184, 183, 183)),
                   ),
                 ],
               ),
