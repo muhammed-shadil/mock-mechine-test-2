@@ -1,12 +1,24 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class MainListTile extends StatelessWidget {
   const MainListTile({
     super.key,
+    required this.centerNumber,
+    required this.countries,
+    required this.exchangerate,
+    required this.lastupdate,
   });
+  final int centerNumber;
+  final String countries;
+  final double exchangerate;
+  final DateTime lastupdate;
 
   @override
   Widget build(BuildContext context) {
+    String formattedDate = DateFormat('MM/dd').format(lastupdate);
+
     return Container(
       padding: const EdgeInsets.all(10),
       margin: const EdgeInsets.only(top: 10, left: 5, right: 5),
@@ -16,12 +28,12 @@ class MainListTile extends StatelessWidget {
         borderRadius: BorderRadius.circular(10),
         color: const Color.fromARGB(255, 47, 46, 77),
       ),
-      child: const Row(
+      child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Row(
             children: [
-              CircleAvatar(
+              const CircleAvatar(
                 backgroundColor: Color.fromARGB(255, 94, 47, 84),
                 radius: 26,
                 child: Icon(
@@ -30,7 +42,7 @@ class MainListTile extends StatelessWidget {
                   size: 20,
                 ),
               ),
-              SizedBox(
+              const SizedBox(
                 width: 10,
               ),
               Column(
@@ -38,14 +50,14 @@ class MainListTile extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    "data",
-                    style: TextStyle(
+                    countries.toUpperCase(),
+                    style: const TextStyle(
                         color: Colors.white,
                         fontSize: 18,
                         fontWeight: FontWeight.w500),
                   ),
                   Text(
-                    "sssss",
+                    formattedDate,
                     style: TextStyle(color: Color.fromARGB(255, 184, 183, 183)),
                   ),
                 ],
@@ -53,8 +65,8 @@ class MainListTile extends StatelessWidget {
             ],
           ),
           Text(
-            "data",
-            style: TextStyle(color: Colors.white),
+            "${exchangerate * centerNumber}",
+            style: const TextStyle(color: Colors.white),
           ),
         ],
       ),

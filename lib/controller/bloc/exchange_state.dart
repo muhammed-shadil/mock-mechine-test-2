@@ -6,9 +6,11 @@ sealed class ExchangeState {}
 final class ExchangeInitial extends ExchangeState {}
 
 class Successfetching extends ExchangeState {
-  final ExchangeRate data;
-
-  Successfetching({required this.data});
+  // final ExchangeRate data;
+final Map<String,dynamic> conversionRatesData;
+  Successfetching(this.lastupdate, {required this.conversionRatesData});
+  // Successfetching({required this.data});
+  final String lastupdate;
 }
 
 class Loadingstate extends ExchangeState {}

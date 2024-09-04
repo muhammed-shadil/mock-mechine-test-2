@@ -2,8 +2,23 @@ import 'dart:async';
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:intl/intl.dart';
+import 'package:mock_mechine_test2/controller/bloc/exchange_bloc.dart';
 import 'package:mock_mechine_test2/view/widgets/custom_appbar.dart';
 import 'package:mock_mechine_test2/view/widgets/main_list_tile.dart';
+
+class InteractivePieChartWrapper extends StatelessWidget {
+  const InteractivePieChartWrapper({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocProvider(
+      create: (context) => ExchangeBloc(),
+      child: const InteractivePieChart(),
+    );
+  }
+}
 
 class InteractivePieChart extends StatefulWidget {
   const InteractivePieChart({super.key});
@@ -20,10 +35,13 @@ class _InteractivePieChartState extends State<InteractivePieChart>
   late Timer _animationTimer;
   final int _animationDuration = 5000; // Duration for animation in milliseconds
   int? _animatedSectionIndex;
+  int _centerNumber = 0; // State variable to store the number in the center
 
   @override
   void initState() {
     super.initState();
+    BlocProvider.of<ExchangeBloc>(context).add(Fetchdata());
+
     _controller = AnimationController(
       duration: const Duration(seconds: 1),
       vsync: this,
@@ -38,6 +56,7 @@ class _InteractivePieChartState extends State<InteractivePieChart>
   }
 
   void _startLoadingAnimation() {
+    BlocProvider.of<ExchangeBloc>(context).add(Fetchdata());
     if (!isAnimating) {
       setState(() {
         isAnimating = true;
@@ -45,7 +64,7 @@ class _InteractivePieChartState extends State<InteractivePieChart>
 
       // Start the animation timer
       _animationTimer =
-          Timer.periodic(const Duration(milliseconds: 500), (timer) {
+          Timer.periodic(const Duration(milliseconds: 200), (timer) {
         if (!isAnimating) {
           timer.cancel();
           return;
@@ -66,6 +85,11 @@ class _InteractivePieChartState extends State<InteractivePieChart>
 
       // Start the animation
       _controller.forward();
+
+      // Generate a random 4-digit number
+      setState(() {
+        _centerNumber = Random().nextInt(9000) + 1000; // 1000 to 9999
+      });
     }
   }
 
@@ -129,19 +153,19 @@ class _InteractivePieChartState extends State<InteractivePieChart>
                         ),
                       ),
                     ),
-                    const Center(
+                    Center(
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text(
-                            '\$1426.7',
-                            style: TextStyle(
+                            '\$$_centerNumber', // Display the generated number
+                            style: const TextStyle(
                               fontSize: 24,
                               color: Colors.black,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-                          Text(
+                          const Text(
                             'Last \$234.67',
                             style: TextStyle(
                               fontSize: 16,
@@ -163,12 +187,34 @@ class _InteractivePieChartState extends State<InteractivePieChart>
                       borderRadius: BorderRadius.circular(20),
                       color: const Color.fromARGB(255, 37, 37, 61)),
                   width: MediaQuery.of(context).size.width * 0.9,
-                  child: ListView.builder(
-                    itemCount: 15,
-                    itemBuilder: (BuildContext context, int index) {
-                      return const MainListTile();
-                    },
-                  ),
+                  child: BlocBuilder<ExchangeBloc, ExchangeState>(
+                      builder: (context, state) {
+                    if (state is Loadingstate) {
+                      return const Center(child: CircularProgressIndicator());
+                    } else if (state is Successfetching) {
+                      return ListView.builder(
+                        itemCount: state.conversionRatesData.length,
+                        itemBuilder: (BuildContext context, int index) {
+                          final String country =
+                              state.conversionRatesData.keys.elementAt(index);
+                          final dynamic currency =
+                              state.conversionRatesData[country];
+                          final String lastupdate = state.lastupdate;
+
+                          return MainListTile(
+                            centerNumber: _centerNumber,
+                            countries: country,
+                            exchangerate:
+                                currency.runtimeType == double ? currency : 0.0,
+                            lastupdate:
+                                DateFormat("EEE, dd MMM yyyy HH:mm:ss Z")
+                                    .parse(lastupdate),
+                          );
+                        },
+                      );
+                    }
+                    return Container();
+                  }),
                 ),
               ),
             ),
@@ -187,7 +233,7 @@ class _InteractivePieChartState extends State<InteractivePieChart>
         value: 42,
         title: '',
         radius: _animatedSectionIndex == 0
-            ? 2 * baseRadius * _animation.value
+            ? 1.2 * baseRadius * _animation.value
             : baseRadius,
       ),
       PieChartSectionData(
@@ -195,7 +241,7 @@ class _InteractivePieChartState extends State<InteractivePieChart>
         value: 33,
         title: '',
         radius: _animatedSectionIndex == 1
-            ? 1.5 * baseRadius * _animation.value
+            ? 1.2 * baseRadius * _animation.value
             : baseRadius,
       ),
       PieChartSectionData(
@@ -203,9 +249,33 @@ class _InteractivePieChartState extends State<InteractivePieChart>
         value: 25,
         title: '',
         radius: _animatedSectionIndex == 2
-            ? 2 * baseRadius * _animation.value
+            ? 1.4 * baseRadius * _animation.value
             : baseRadius,
       ),
     ];
   }
 }
+
+List<String> countries = [
+  "aed",
+  "afn",
+  "all",
+  "amd",
+  "ang",
+  "aoa",
+  "ars",
+  "aud",
+  "awg",
+  "azn",
+  "bam",
+  "bbd",
+  "bdt",
+  "bgn",
+  "bhd",
+  "bif",
+  "bmd",
+  "bnd",
+  "bob",
+  "brl",
+  "bsd"
+];
