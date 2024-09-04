@@ -2,8 +2,8 @@ import 'dart:async';
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
-import 'package:mock_mechine_test2/custom_appbar.dart';
-import 'package:mock_mechine_test2/main_list_tile.dart';
+import 'package:mock_mechine_test2/view/widgets/custom_appbar.dart';
+import 'package:mock_mechine_test2/view/widgets/main_list_tile.dart';
 
 class InteractivePieChart extends StatefulWidget {
   const InteractivePieChart({super.key});

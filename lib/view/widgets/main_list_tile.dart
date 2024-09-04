@@ -8,8 +8,8 @@ class MainListTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.all(10),
-      margin: EdgeInsets.only(top: 10, left: 5, right: 5),
+      padding: const EdgeInsets.all(10),
+      margin: const EdgeInsets.only(top: 10, left: 5, right: 5),
       width: 100,
       height: 70,
       decoration: BoxDecoration(

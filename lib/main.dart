@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:mock_mechine_test2/loginpage.dart';
+import 'package:mock_mechine_test2/view/screens/homepage.dart';
 
 void main() {
   runApp(const MyApp());
